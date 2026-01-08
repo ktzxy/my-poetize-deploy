@@ -1,0 +1,66 @@
+{
+  "name": "POETIZE - 优雅的博客系统",
+  "short_name": "POETIZE",
+  "description": "一个优雅、现代的博客系统，支持Markdown编辑、智能推荐、社交互动等功能",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/poetize.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/poetize.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "lifestyle",
+    "productivity",
+    "social"
+  ],
+  "screenshots": [
+    {
+      "src": "/poetize.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "写文章",
+      "short_name": "写作",
+      "description": "快速开始写作",
+      "url": "/admin/postEdit",
+      "icons": [
+        {
+          "src": "/poetize.jpg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "我的收藏",
+      "short_name": "收藏",
+      "description": "查看收藏的文章",
+      "url": "/weiYan",
+      "icons": [
+        {
+          "src": "/poetize.jpg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "scope": "/",
+  "lang": "zh-CN",
+  "dir": "ltr"
+}

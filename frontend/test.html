@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统功能测试 - Poetize</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .test-panel {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+
+    .test-controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #38a169;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+    }
+
+    .btn-danger {
+      background: #f56565;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #e53e3e;
+    }
+
+    .console-output {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border-radius: 8px;
+      padding: 20px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      max-height: 600px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .console-output::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .console-output::-webkit-scrollbar-track {
+      background: #2d2d2d;
+      border-radius: 4px;
+    }
+
+    .console-output::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+    }
+
+    .console-output::-webkit-scrollbar-thumb:hover {
+      background: #777;
+    }
+
+    .test-results {
+      margin-top: 20px;
+    }
+
+    .result-card {
+      background: #f7fafc;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-left: 4px solid #667eea;
+    }
+
+    .result-card.pass {
+      border-left-color: #48bb78;
+    }
+
+    .result-card.fail {
+      border-left-color: #f56565;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .result-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .result-badge {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-pass {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    .badge-fail {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .footer {
+      text-align: center;
+      color: white;
+      margin-top: 30px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🧪 系统功能测试</h1>
+      <p>Poetize博客系统 - 自动化功能测试工具</p>
+    </div>
+
+    <div class="test-panel">
+      <div class="test-controls">
+        <button class="btn-primary" onclick="runAllTests()">▶ 运行全部测试</button>
+        <button class="btn-secondary" onclick="exportReport()">📄 导出报告</button>
+        <button class="btn-danger" onclick="clearConsole()">🗑️ 清空控制台</button>
+      </div>
+
+      <div id="stats" class="stats" style="display:none;">
+        <div class="stat-card">
+          <div class="stat-value" id="totalTests">0</div>
+          <div class="stat-label">总测试数</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="passedTests">0</div>
+          <div class="stat-label">通过</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="failedTests">0</div>
+          <div class="stat-label">失败</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="passRate">0%</div>
+          <div class="stat-label">通过率</div>
+        </div>
+      </div>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>测试进行中，请稍候...</p>
+      </div>
+
+      <div class="console-output" id="console"></div>
+
+      <div id="results" class="test-results"></div>
+    </div>
+
+    <div class="footer">
+      <p>Poetize © 2024 - 测试工具 v1.0</p>
+    </div>
+  </div>
+
+  <script>
+    // 简化的测试工具（不依赖外部模块）
+    const SimpleTester = {
+      testResults: [],
+
+      async runAllTests() {
+        console.log('='.repeat(60));
+        console.log('🧪 开始系统功能测试...');
+        console.log('='.repeat(60));
+        
+        this.testResults = [];
+        
+        // 测试基础功能
+        await this.testBasicFunctions();
+        
+        // 输出测试报告
+        this.printTestReport();
+        
+        return this.testResults;
+      },
+
+      async testBasicFunctions() {
+        const moduleName = '基础功能测试';
+        console.log(`\n📊 测试 ${moduleName}...`);
+        
+        try {
+          // 测试 LocalStorage
+          this.assert(typeof localStorage !== 'undefined', 'LocalStorage 可用');
+          localStorage.setItem('test', 'value');
+          this.assert(localStorage.getItem('test') === 'value', 'LocalStorage 读写正常');
+          localStorage.removeItem('test');
+          
+          // 测试 Performance API
+          this.assert(typeof performance !== 'undefined', 'Performance API 可用');
+          this.assert(typeof performance.now === 'function', 'performance.now() 可用');
+          
+          // 测试 Intl API
+          this.assert(typeof Intl !== 'undefined', 'Intl API 可用');
+          const date = new Intl.DateTimeFormat('zh-CN').format(new Date());
+          this.assert(typeof date === 'string', '日期格式化正常');
+          
+          // 测试 Fetch API
+          this.assert(typeof fetch === 'function', 'Fetch API 可用');
+          
+          // 测试 Promise
+          this.assert(typeof Promise !== 'undefined', 'Promise 可用');
+          await new Promise(resolve => setTimeout(resolve, 10));
+          this.assert(true, '异步操作正常');
+          
+          this.pass(moduleName);
+        } catch (error) {
+          this.fail(moduleName, error);
+        }
+      },
+
+      assert(condition, message) {
+        if (!condition) {
+          throw new Error(`断言失败: ${message}`);
+        }
+        console.log(`  ✓ ${message}`);
+      },
+
+      pass(moduleName) {
+        this.testResults.push({
+          module: moduleName,
+          status: 'PASS',
+          time: new Date().toISOString()
+        });
+        console.log(`  ✅ ${moduleName} 测试通过`);
+      },
+
+      fail(moduleName, error) {
+        this.testResults.push({
+          module: moduleName,
+          status: 'FAIL',
+          error: error.message,
+          time: new Date().toISOString()
+        });
+        console.error(`  ❌ ${moduleName} 测试失败:`, error.message);
+      },
+
+      printTestReport() {
+        console.log('\n' + '='.repeat(60));
+        console.log('📋 测试报告');
+        console.log('='.repeat(60));
+        
+        const passed = this.testResults.filter(r => r.status === 'PASS').length;
+        const failed = this.testResults.filter(r => r.status === 'FAIL').length;
+        const total = this.testResults.length;
+        
+        console.log(`\n总计: ${total} 个模块`);
+        console.log(`✅ 通过: ${passed} 个`);
+        console.log(`❌ 失败: ${failed} 个`);
+        console.log(`📊 通过率: ${((passed / total) * 100).toFixed(2)}%`);
+        
+        if (failed > 0) {
+          console.log('\n失败的模块:');
+          this.testResults
+            .filter(r => r.status === 'FAIL')
+            .forEach(r => {
+              console.log(`  ❌ ${r.module}: ${r.error}`);
+            });
+        }
+        
+        console.log('\n' + '='.repeat(60));
+        console.log('🎉 测试完成！');
+        console.log('='.repeat(60));
+      },
+
+      exportReport() {
+        const report = {
+          summary: {
+            total: this.testResults.length,
+            passed: this.testResults.filter(r => r.status === 'PASS').length,
+            failed: this.testResults.filter(r => r.status === 'FAIL').length,
+            passRate: ((this.testResults.filter(r => r.status === 'PASS').length / this.testResults.length) * 100).toFixed(2) + '%'
+          },
+          results: this.testResults,
+          exportedAt: new Date().toISOString()
+        };
+
+        const json = JSON.stringify(report, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `test_report_${Date.now()}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+        
+        console.log('📄 测试报告已导出');
+      }
+    };
+
+    window.runAllTests = async function() {
+      const consoleDiv = document.getElementById('console');
+      const loadingDiv = document.getElementById('loading');
+      const statsDiv = document.getElementById('stats');
+      const resultsDiv = document.getElementById('results');
+
+      // 清空之前的结果
+      consoleDiv.textContent = '';
+      resultsDiv.innerHTML = '';
+      statsDiv.style.display = 'none';
+      loadingDiv.classList.add('active');
+
+      // 重定向console.log
+      const originalLog = console.log;
+      const originalError = console.error;
+      
+      console.log = function(...args) {
+        originalLog.apply(console, args);
+        consoleDiv.textContent += args.join(' ') + '\n';
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+      };
+
+      console.error = function(...args) {
+        originalError.apply(console, args);
+        consoleDiv.textContent += '❌ ' + args.join(' ') + '\n';
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+      };
+
+      try {
+        // 运行测试
+        const results = await SimpleTester.runAllTests();
+
+        // 恢复console
+        console.log = originalLog;
+        console.error = originalError;
+
+        // 显示统计
+        const passed = results.filter(r => r.status === 'PASS').length;
+        const failed = results.filter(r => r.status === 'FAIL').length;
+        const total = results.length;
+        const passRate = ((passed / total) * 100).toFixed(2);
+
+        document.getElementById('totalTests').textContent = total;
+        document.getElementById('passedTests').textContent = passed;
+        document.getElementById('failedTests').textContent = failed;
+        document.getElementById('passRate').textContent = passRate + '%';
+        statsDiv.style.display = 'grid';
+
+        // 显示详细结果
+        results.forEach(result => {
+          const card = document.createElement('div');
+          card.className = `result-card ${result.status === 'PASS' ? 'pass' : 'fail'}`;
+          card.innerHTML = `
+            <div class="result-header">
+              <div class="result-title">${result.module}</div>
+              <div class="result-badge ${result.status === 'PASS' ? 'badge-pass' : 'badge-fail'}">
+                ${result.status === 'PASS' ? '✓ 通过' : '✗ 失败'}
+              </div>
+            </div>
+            ${result.error ? `<div style="color: #e53e3e; margin-top: 10px;">错误: ${result.error}</div>` : ''}
+            <div style="color: #718096; font-size: 12px; margin-top: 10px;">
+              测试时间: ${new Date(result.time).toLocaleString('zh-CN')}
+            </div>
+          `;
+          resultsDiv.appendChild(card);
+        });
+
+      } catch (error) {
+        console.error('测试执行出错:', error);
+      } finally {
+        loadingDiv.classList.remove('active');
+      }
+    };
+
+    window.exportReport = function() {
+      SimpleTester.exportReport();
+    };
+
+    window.clearConsole = function() {
+      document.getElementById('console').textContent = '';
+      document.getElementById('results').innerHTML = '';
+      document.getElementById('stats').style.display = 'none';
+    };
+
+    // 页面加载完成后的提示
+    console.log('✅ 测试工具已就绪');
+    console.log('💡 点击"运行全部测试"按钮开始测试所有功能模块');
+    console.log('');
+  </script>
+</body>
+</html>
