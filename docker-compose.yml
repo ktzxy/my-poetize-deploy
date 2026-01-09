@@ -12,7 +12,7 @@ services:
       TZ: Asia/Shanghai
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./poetize-server/sql/poetize.sql:/docker-entrypoint-initdb.d/poetry.sql:ro
+      - ./database/poetize.sql:/docker-entrypoint-initdb.d/poetize.sql:ro
     # 安全：不暴露端口到宿主机，仅内部网络访问
     ports:
        - "23306:3306"
