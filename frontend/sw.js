@@ -356,15 +356,88 @@ self.addEventListener('sync', (event) => {
   
   if (event.tag === 'sync-articles') {
     event.waitUntil(
-      // TODO: 实现文章同步逻辑
-      fetch('/api/articles/sync')
+      // 实现文章同步逻辑
+      Promise.all([
+        // 同步文章列表
+        fetch('/api/article/listArticle', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            current: 1,
+            size: 20,
+            searchKey: '',
+            articleSearch: '',
+            recommendStatus: null,
+            sortId: null,
+            labelId: null
+          })
+        })
         .then(response => response.json())
         .then(data => {
-          console.log('[Service Worker] 同步成功:', data);
+          console.log('[Service Worker] 文章列表同步成功:', data);
+          // 将文章列表缓存到Cache Storage
+          if (data && data.data && data.data.records) {
+            return caches.open(CACHE_NAME).then(cache => {
+              data.data.records.forEach(article => {
+                // 缓存每篇文章的详情页
+                const articleUrl = `/article?id=${article.id}`;
+                fetch(articleUrl)
+                  .then(articleRes => articleRes.text())
+                  .then(articleHtml => {
+                    const response = new Response(articleHtml, {
+                      headers: { 'Content-Type': 'text/html' }
+                    });
+                    cache.put(articleUrl, response);
+                  })
+                  .catch(err => console.error('缓存文章失败:', err));
+              });
+            });
+          }
         })
         .catch(error => {
-          console.error('[Service Worker] 同步失败:', error);
+          console.error('[Service Worker] 同步文章列表失败:', error);
+        }),
+        
+        // 同步收藏数据
+        fetch('/api/article/getUserCollections?current=1&size=100', {
+          method: 'GET',
+          credentials: 'include' // 包含认证信息
         })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error('获取收藏数据失败');
+        })
+        .then(data => {
+          console.log('[Service Worker] 收藏数据同步成功:', data);
+          // 在IndexedDB中存储收藏数据以供前端使用
+          if (typeof window !== 'undefined' && window.indexedDB) {
+            const request = indexedDB.open('PoetizeDB', 1);
+            
+            request.onsuccess = function(event) {
+              const db = event.target.result;
+              const transaction = db.transaction(['collections'], 'readwrite');
+              const objectStore = transaction.objectStore('collections');
+              
+              // 清空现有数据
+              objectStore.clear().onsuccess = function() {
+                // 添加新数据
+                if (data && data.data && data.data.records) {
+                  data.data.records.forEach(item => {
+                    objectStore.add(item);
+                  });
+                }
+              };
+            };
+          }
+        })
+        .catch(error => {
+          console.error('[Service Worker] 同步收藏数据失败:', error);
+        })
+      ])
     );
   }
 });
