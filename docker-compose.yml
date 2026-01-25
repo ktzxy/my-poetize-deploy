@@ -70,8 +70,8 @@ services:
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_ENABLE: ${MAIL_ENABLE}
-      LOCAL_DOWNLOAD_URL: https://${DOMAIN}:8080/resourceStorage/
-      CORS_ALLOWED_ORIGINS: https://${DOMAIN}:8080,https://www.${DOMAIN}:8080
+      LOCAL_DOWNLOAD_URL: https://${DOMAIN}/resourceStorage/
+      CORS_ALLOWED_ORIGINS: https://${DOMAIN},https://www.${DOMAIN}
       TZ: Asia/Shanghai
       # JVM 参数 - 优化内存使用
       JAVA_OPTS: -Xms${JVM_XMS} -Xmx${JVM_XMX} -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication

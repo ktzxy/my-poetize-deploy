@@ -9,8 +9,6 @@ WORKDIR /app
 
 COPY backend/poetize-server.jar /app/app.jar
 
-# 不再复制 frontend！
-
 RUN mkdir -p /app/logs
 
 EXPOSE 8081
